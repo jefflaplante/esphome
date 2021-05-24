@@ -1,23 +1,8 @@
-esphome:
-  name: garage_opener
-  platform: ESP8266
-  board: nodemcuv2
+substitutions:
+  devicename: garage_opener
 
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  ap:
-    ssid: "Garage Opener Fallback Hotspot"
-    password: "lsJXSISTaUpp"
-
-captive_portal:
-
-logger:
-api:
-ota:
-
-status_led:
-  pin: D0
+packages:
+  common: !include .common.yaml
   
 sensor:
   - platform: wifi_signal
@@ -55,4 +40,3 @@ switch:
     
   - platform: restart 
     name: "Garage Remote Restart"
-
