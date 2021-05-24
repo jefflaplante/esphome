@@ -1,0 +1,58 @@
+esphome:
+  name: garage_opener
+  platform: ESP8266
+  board: nodemcuv2
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Garage Opener Fallback Hotspot"
+    password: "lsJXSISTaUpp"
+
+captive_portal:
+
+logger:
+api:
+ota:
+
+status_led:
+  pin: D0
+  
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval: 120s
+  - platform: dht
+    pin: D7
+    temperature:
+      name: "Garage Temperature"
+      unit_of_measurement: "°C"
+    humidity:
+      name: "Garage Humidity"
+    update_interval: 120s
+
+binary_sensor:
+  - platform: gpio
+    name: "Garage Door"
+    device_class: "garage_door"
+    pin:
+      number: D1
+      mode: INPUT_PULLUP
+      inverted: true
+
+switch:
+  - platform: gpio
+    pin: D2
+    id: relay
+  - platform: template
+    name: "Garage Remote"
+    icon: "mdi:garage"
+    turn_on_action:
+    - switch.turn_on: relay
+    - delay: 200ms
+    - switch.turn_off: relay
+    
+  - platform: restart 
+    name: "Garage Remote Restart"
+
