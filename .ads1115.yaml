@@ -1,0 +1,3 @@
+ads1115:
+  - address: 0x48
+    continuous_mode: on

@@ -1,0 +1,7 @@
+font:
+  - file: "fonts/SFNSMono.ttf"
+    id: font_10 
+    size: 10 
+  - file: "fonts/SFNSMono.ttf"
+    id: font_16 
+    size: 16

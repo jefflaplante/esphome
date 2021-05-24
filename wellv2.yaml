@@ -1,29 +1,11 @@
-esphome:
-  name: wellv2
-  platform: ESP8266
-  board: nodemcuv2
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
-  ap:
-    ssid: "Well Fallback Hotspot"
-    password: "XP3ipKcUzXmJ"
-captive_portal:
-logger:
-api:
-ota:
-status_led:
-  pin:
-    number: D0
-    inverted: True
-text_sensor:
-  - platform: wifi_info
-    ip_address:
-      name: ESP IP Address
-    ssid:
-      name: ESP Connected SSID
-    mac_address:
-      name: ESP Mac Wifi Address
+substitutions:
+  devicename: wellv2
+
+packages:
+  common: !include .common.yaml
+  i2c: !include .i2c.yaml
+  ads1115: !include .ads1115.yaml
+
 binary_sensor:
   - platform: status
     name: "Well Sensor Status"
@@ -40,13 +22,6 @@ binary_sensor:
       - delayed_on: 10ms
       - delayed_off: 10ms
 
-i2c:
-  scl: D1
-  sda: D2
-  scan: True
-ads1115:
-  - address: 0x48
-    continuous_mode: on
 sensor:
   - platform: wifi_signal
     id: well_wifi_signal
@@ -72,7 +47,7 @@ sensor:
       - calibrate_polynomial:
           degree: 2
           datapoints:
-            - 1.120 -> 0.0  
+            - 1.120 -> 0.0
             #- 0.200 -> 10.0
             #- 1.310 -> 15.0
             #- 0.920 -> 20.0

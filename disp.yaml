@@ -1,33 +1,10 @@
-esphome:
-  name: disp
-  platform: ESP8266
-  board: nodemcuv2
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password 
-  ap:
-    ssid: "Display Fallback Hotspot"
-    password: "XP3ipKcUzXmJ"
-captive_portal:
-logger:
-api:
-ota:
-status_led:
-  pin:
-    number: D0
-    inverted: True
+substitutions:
+  devicename: disp
 
-time:
-  - platform: homeassistant
-    id: esptime
-
-font:
-  - file: "fonts/SFNSMono.ttf"
-    id: font_10 
-    size: 10 
-  - file: "fonts/SFNSMono.ttf"
-    id: font_16 
-    size: 16 
+packages:
+  common: !include .common.yaml
+  i2c: !include .i2c.yaml
+  fonts: !include .fonts.yaml
 
 sensor:
   - platform: homeassistant
@@ -40,11 +17,6 @@ binary_sensor:
     id: well_pump_on 
     entity_id: binary_sensor.well_pump_2 
     internal: true
-
-i2c:
-  scl: D1
-  sda: D2
-  scan: True
 
 display:
   - platform: ssd1306_i2c

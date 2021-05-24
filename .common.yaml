@@ -1,0 +1,27 @@
+esphome:
+  name: ${devicename}
+  platform: ESP8266
+  board: nodemcuv2
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "${devicename} Fallback Hotspot"
+    password: "XP3ipKcUzXmJ"
+captive_portal:
+logger:
+api:
+ota:
+text_sensor:
+  - platform: wifi_info
+    ssid:
+      name: ESP Connected SSID
+    ip_address:
+      name: ESP IP Address
+    mac_address:
+      name: ESP Mac Wifi Address
+status_led:
+  pin:
+    number: D0
+    inverted: True
+
