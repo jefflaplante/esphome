@@ -1,0 +1,73 @@
+substitutions:
+  devicename: watertank
+
+packages:
+  common: !include .common.yaml
+  i2c: !include .i2c.yaml
+  ads1115: !include .ads1115.yaml
+
+binary_sensor:
+  - platform: status
+    name: "Water Tank Status"
+
+sensor:
+  - platform: wifi_signal
+    id: water_tank_wifi_signal
+    name: "Water Tank WiFi Signal"
+    update_interval: 120s
+
+  # Water Pressure Sensor 0-10psi
+  #
+  # Water psi is 0.433 psi per foot in water height
+  # Eqivalent in inches == 0.433*0.083 = 0.0359
+  # 12" of water is 1' = 0.433 * 1 = 0.433 psi
+  # 24" ~ 2' = 0.433 * 2 = 0.866 psi
+  # 36" ~ 3' = 0.433 * 3 = 1.299 psi 
+  # 48" ~ 4' = 0.433 * 4 = 1.732 psi
+  # 60" ~ 5' = 0.433 * 5 = 2.165 psi
+  # 
+  # Tank height full is 54" == 1.90 psi
+  
+  - platform: ads1115
+    multiplexer: 'A0_A1'
+    gain: 6.144
+    name: "Water Tank Pressure"
+    id: water_tank_pressure
+    update_interval: 10s
+    unit_of_measurement: "psi"
+    icon: "mdi:gauge"
+    accuracy_decimals: 2
+    filters:
+      - median:
+          window_size: 9 
+          send_every: 3
+      - lambda: |-
+          if(x < 0) { return 0; } else { return x; };
+      - calibrate_polynomial:
+          degree: 3
+          datapoints:
+            # volts -> psi at n inches of water
+            - 0.870 -> 0.0    # 0"
+            - 1.480 -> 1.299  # 36" 
+            #- 0.43  -> 1.62  # 45"
+            - 1.83 -> 2.00    # 1.8V == 57" == 375 gallons
+            - 4.10 -> 10.0    # Max pressure measurable
+      - lambda: |-
+          if(x < 0) { return 0; } else { return x; };
+
+  - platform: template
+    id: tank_vol
+    name: "Water Tank Volume"
+    unit_of_measurement: "gal"
+    icon: "mdi:water-pump"
+    lambda: |-
+      const float pressure_per_inch = 0.036;  // 0.4335 psi per foot of water, divided by 12 for inches
+      const int gallons_per_inch = 6.7;       // average volume in one inch of water in tank
+      return((id(water_tank_pressure).state / pressure_per_inch) * gallons_per_inch); // gallons
+    update_interval: 60s
+    accuracy_decimals: 1
+    filters:
+      - lambda: |-
+          const int MAX_GAL = 400; // Max fill volume of tank
+          if(x > MAX_GAL) { return MAX_GAL; } else { return x; };
+
